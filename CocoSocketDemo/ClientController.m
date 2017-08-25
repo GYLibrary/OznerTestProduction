@@ -40,7 +40,21 @@
 - (IBAction)connectAction:(id)sender {
     
 // 2.链接服务器
-    [self.clientSocket connectToHost:self.addressTF.text onPort:self.portTF.text.integerValue viaInterface:nil withTimeout:-1 error:nil];
+//    [self.clientSocket connectToHost:self.addressTF.text onPort:self.portTF.text.integerValue viaInterface:nil withTimeout:-1 error:nil];
+//   BOOL reselt =  [self.clientSocket connectToHost:self.addressTF.text onPort:[self.portTF.text integerValue] error:nil];
+    uint16_t intA = 9999;
+    [self.clientSocket connectToHost:self.addressTF.text onPort:intA error:nil];
+//    NSError *error = nil;
+//    
+//   BOOL reselt =  [self.clientSocket connectToHost:self.addressTF.text onPort:9999 withTimeout:-1 error:&error];
+//    
+//    if (reselt) {
+////        NSLog(@"%@",error);
+//        NSLog(@"%@",self.clientSocket.connectedHost);
+//        NSLog(@"%hu",self.clientSocket.connectedPort);
+//        
+//
+//    }
     
 }
 //断开链接
@@ -72,6 +86,8 @@
     [self.clientSocket readDataWithTimeout:- 1 tag:0];
 
 }
+
+
 
 // 收到消息
 - (void)socket:(GCDAsyncSocket *)sock didReadData:(NSData *)data withTag:(long)tag {

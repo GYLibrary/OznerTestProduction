@@ -45,17 +45,31 @@
     self.serverSocket = [[GCDAsyncSocket alloc]initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
     _ipLb.text = [self getIPAddress];
     _clientSockets = [[NSMutableArray alloc] init];
+//    [[NSRunLoop mainRunLoop] run];
     
 }
+
 - (IBAction)startNotice:(id)sender {
     // 2.开放哪一个端口
     NSError *error = nil;
-    BOOL result = [self.serverSocket acceptOnPort:self.portF.text.integerValue error:&error];
-//    BOOL result = [self.serverSocket acceptOnInterface:@"192.168.1.122" port:self.portF.text.integerValue error:&error];
-    if (result && error == nil) {
-        // 开放成功
-        [self showMessageWithStr:@"开放成功"];
+
+    uint16_t intA = 9999;
+    
+    
+    @try {
+        [self.serverSocket acceptOnPort:intA error:&error];
+    } @catch (NSException *exception) {
+        
+    } @finally {
+       [self showMessageWithStr:@"开放成功"];
     }
+    
+//    BOOL result = [self.serverSocket acceptOnPort:[self.portF.text integerValue] error:&error];
+//    BOOL result = [self.serverSocket acceptOnInterface:@"192.168.1.122" port:self.portF.text.integerValue error:&error];
+//    if (result && error == nil) {
+//        // 开放成功
+//        [self showMessageWithStr:@"开放成功"];
+//    }
     
 }
 
@@ -93,32 +107,37 @@
 #pragma mark - 服务器socketDelegate
 - (void)socket:(GCDAsyncSocket *)sock didAcceptNewSocket:(GCDAsyncSocket *)newSocket {
 // 保存客户端的socket
-    self.clientSocket = newSocket;
-//    for (GCDAsyncSocket *item in self.clientSockets) {
+ 
+//    self.clientSocket = newSocket;
+//    for (NSString *item in self.clientSockets) {
 //        
-//        if ([item.localHost isEqualToString:newSocket.localHost]) {
+//        if ([item isEqualToString:newSocket.localHost]) {
 //            [self.clientSockets removeObject:item];
 //            continue;
 //        }
 //        
 //    }
-//    
-//    [self.clientSockets addObject:newSocket];
+    [self.clientSockets addObject:newSocket];
     [self showMessageWithStr:@"链接成功"];
     [self showMessageWithStr:[NSString stringWithFormat:@"服务器地址: %@ -端口: %d", newSocket.connectedHost, newSocket.connectedPort]];
-    [self.clientSocket readDataWithTimeout:- 1 tag:0];
+//    [self.clientSocket readDataWithTimeout:- 1 tag:0];
+    [newSocket readDataWithTimeout:-1 tag:0];
 }
+
 
 // 收到消息
 - (void)socket:(GCDAsyncSocket *)sock didReadData:(NSData *)data withTag:(long)tag {
     
     NSString *text = [[NSString alloc]initWithData:data encoding:NSUTF8StringEncoding];
     [self showMessageWithStr:text];
-    [self.clientSocket readDataWithTimeout:- 1 tag:0];
+//    [self.clientSocket readDataWithTimeout:- 1 tag:0];
     
     //成功收到消息后回复 客户端
-    [self.clientSocket writeData:data withTimeout:- 1 tag:0];
-    
+//    [self.clientSocket writeData:data withTimeout:- 1 tag:0];
+//    self.clientSocket = nil;
+    [sock readDataWithTimeout:-1 tag:0];
+    [sock writeData:data withTimeout:-1 tag:0];
+//
 }
 
 // Get IP Address
